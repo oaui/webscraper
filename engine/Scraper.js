@@ -8,6 +8,8 @@ import {
 import { setupProxy } from "../proxy/Proxyutil.js";
 import { log } from "../util/Util.js";
 import { getBrowser } from "./Browser.js";
+import { solveCaptcha } from "./Captcha.js";
+import { automate } from "./Automation.js";
 import { Browser } from "rebrowser-puppeteer-core";
 
 const BROWSER_CONFIG = {
@@ -153,7 +155,14 @@ async function setupBrowser(website, browserId, browsers, proxies) {
       timeout: 60000,
     });
 
-    log("INFO", `Browser ${browserId}: Checking for Turnstile/Challenge`);
+    /**
+     * ? This is where the magic happens.
+     */
+    const captchaResult = await solveCaptcha(page);
+
+    if (captchaResult.success) {
+      await automate(page);
+    }
   } catch (error) {
     log(
       "ERROR",
@@ -164,7 +173,7 @@ async function setupBrowser(website, browserId, browsers, proxies) {
         await browser.close();
       } catch {}
     }
-    return { success: false, browserData: null };
+    return { success: false };
   }
 }
 
@@ -195,9 +204,7 @@ async function startBrowsers(website, browserCount = 1) {
     .filter(Boolean);
 
   log("INFO", `Amount of browser instances: ${results.length}`);
-  const successfulBrowsers = results.filter(
-    (r) => r && r.success && r.browserData,
-  );
+  const successfulBrowsers = results.filter((r) => r && r.success);
   log("INFO", `Successfully connected browsers: ${successfulBrowsers.length}`);
 }
 

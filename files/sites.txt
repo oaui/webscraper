@@ -1,2 +1,1 @@
-https://flottweg.de
-https://delta.de
+https://recaptcha-demo.appspot.com/recaptcha-v2-checkbox.php

@@ -3,7 +3,7 @@ import fs from "fs";
 import "dotenv/config";
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // 👈 match your .env
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function retrieveAiResponse(imagePath, promptText) {
@@ -12,7 +12,7 @@ export async function retrieveAiResponse(imagePath, promptText) {
     const base64Image = imageBuffer.toString("base64");
 
     const response = await client.chat.completions.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "user",
