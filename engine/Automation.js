@@ -1,3 +1,5 @@
+import { solveCaptcha } from "./Captcha";
+
 export async function automate(page) {
   while (true) {
     try {
@@ -51,6 +53,7 @@ async function scanWebsite(page) {
             return (el.textContent || "").toLowerCase();
           }, element);
 
+          const captchaSolved = await solveCaptcha(page);
           const cookiesPresent = await handleCookies(page);
           const jobs = await handlePotentialJobs(text, page, element);
 

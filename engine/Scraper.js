@@ -17,27 +17,6 @@ const BROWSER_CONFIG = {
     process.argv.find((arg) => arg.startsWith("-site="))?.split("=")[1] ||
     process.argv.find((arg) => arg.startsWith("--website="))?.split("=")[1] ||
     "https://example.com",
-  targetPort:
-    parseInt(
-      process.argv.find((arg) => arg.startsWith("-port="))?.split("=")[1],
-    ) ||
-    parseInt(
-      process.argv
-        .find((arg) => arg.startsWith("--targetPort="))
-        ?.split("=")[1],
-    ) ||
-    null,
-  browserCount:
-    /**
-     * * Max amount of browsers with different proxies
-     */
-    parseInt(
-      process.argv.find((arg) => arg.startsWith("-b="))?.split("=")[1],
-    ) ||
-    parseInt(
-      process.argv.find((arg) => arg.startsWith("--browsers="))?.split("=")[1],
-    ) ||
-    5,
   runtime:
     parseInt(
       process.argv.find((arg) => arg.startsWith("--time="))?.split("=")[1],
@@ -73,11 +52,6 @@ for (let i = 0; i < args.length; i++) {
       BROWSER_CONFIG.website = args[i + 1];
       i++;
       break;
-    case "--browsers":
-    case "-b":
-      BROWSER_CONFIG.browserCount = parseInt(args[i + 1]);
-      i++;
-      break;
     case "--time":
     case "-runtime":
       BROWSER_CONFIG.runtime = parseInt(args[i + 1]);
@@ -101,9 +75,6 @@ for (let i = 0; i < args.length; i++) {
     case "--help":
     case "-h":
       console.log(`
-🌐 Cloudflare Browser Automation Tool
-
-Usage: node browser.js [options]
 
 Required Options:
       -site, --websites <url> [String, Array] Target URL(s) to visit (e.g. -site https://example.com or -site urls.txt)
