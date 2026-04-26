@@ -8,35 +8,24 @@ export async function solveCaptcha(page) {
 
       if (url.includes("challenges.cloudflare.com")) {
         captchaType = "cloudflare";
-        try {
-          await frame.waitForSelector('input[type="checkbox"]', {
-            visible: true,
-            timeout: 3000,
-          });
-          await new Promise((r) => setTimeout(r, 500));
-          await frame.click('input[type="checkbox"]');
-          return { success: true, captchaType };
-        } catch {}
+        return {
+          success: await solveHelper(frame, 'input[type="checkbox"]').sucess,
+          captchaType,
+        };
       }
       if (/hcaptcha\.com/.test(url) && /checkbox/i.test(url)) {
         captchaType = "hcaptcha";
-        await frame.waitForSelector("#checkbox", {
-          visible: true,
-          timeout: 3000,
-        });
-        await frame.click("#checkbox", { delay: 500 });
-        return { success: true, captchaType };
+        return {
+          success: await solveHelper(frame, "#checkbox").sucess,
+          captchaType,
+        };
       }
       if (frame.url().includes("frcapi.com")) {
         captchaType = "friendlycaptcha";
-        try {
-          await frame.waitForSelector('button[role="checkbox"]', {
-            visible: true,
-            timeout: 3000,
-          });
-          await frame.click('button[role="checkbox"]');
-          return { success: true, captchaType };
-        } catch {}
+        return {
+          success: await solveHelper(frame, 'button[role="checkbox"]').sucess,
+          captchaType,
+        };
       }
 
       const recaptcha = await handleRecaptcha(page);
@@ -50,6 +39,22 @@ export async function solveCaptcha(page) {
       return { success: false, captchaType: null };
     }
   }
+}
+
+async function solveHelper(frame, type = 'button[role="checkbox"]') {
+  try {
+    await frame.waitForSelector(type, {
+      visible: true,
+      timeout: 3000,
+    });
+    await frame.click(type);
+    return { success: true };
+  } catch {
+    /**
+     * ! Note: We do not return anything, as the frame might detach
+     * */
+  }
+  return { sucess: false };
 }
 
 async function handleRecaptcha(page) {

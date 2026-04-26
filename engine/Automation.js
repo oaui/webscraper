@@ -1,4 +1,4 @@
-import { solveCaptcha } from "./Captcha";
+import { solveCaptcha } from "./Captcha.js";
 
 export async function automate(page) {
   while (true) {
