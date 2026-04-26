@@ -9,21 +9,21 @@ export async function solveCaptcha(page) {
       if (url.includes("challenges.cloudflare.com")) {
         captchaType = "cloudflare";
         return {
-          success: await solveHelper(frame, 'input[type="checkbox"]').sucess,
+          success: await solveHelper(frame, 'input[type="checkbox"]').success,
           captchaType,
         };
       }
       if (/hcaptcha\.com/.test(url) && /checkbox/i.test(url)) {
         captchaType = "hcaptcha";
         return {
-          success: await solveHelper(frame, "#checkbox").sucess,
+          success: await solveHelper(frame, "#checkbox").success,
           captchaType,
         };
       }
       if (frame.url().includes("frcapi.com")) {
         captchaType = "friendlycaptcha";
         return {
-          success: await solveHelper(frame, 'button[role="checkbox"]').sucess,
+          success: await solveHelper(frame, 'button[role="checkbox"]').success,
           captchaType,
         };
       }
@@ -54,7 +54,7 @@ async function solveHelper(frame, type = 'button[role="checkbox"]') {
      * ! Note: We do not return anything, as the frame might detach
      * */
   }
-  return { sucess: false };
+  return { success: false };
 }
 
 async function handleRecaptcha(page) {
