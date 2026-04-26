@@ -1,16 +1,18 @@
 import { solveCaptcha } from "./Captcha.js";
+import { log } from "../util/Util.js";
 
 export async function automate(page) {
-  while (true) {
+  for (let i = 0; i < 3; i++) {
     try {
       const didNavigate = await scanWebsite(page);
-      if (!didNavigate) {
+      if (!didNavigate.success) {
         await page.waitForTimeout(1000);
       }
     } catch (e) {
       continue;
     }
   }
+  return { success: true };
 }
 async function handlePotentialJobs(text, page, element) {
   const jobs = ["entwickler", "developer", "linux"];
@@ -54,8 +56,10 @@ async function scanWebsite(page) {
           }, element);
 
           const captchaSolved = await solveCaptcha(page);
-          const cookiesPresent = await handleCookies(page);
-          const jobs = await handlePotentialJobs(text, page, element);
+          if (captchaSolved.success) {
+            const cookiesPresent = await handleCookies(page);
+            const jobs = await handlePotentialJobs(text, page, element);
+          }
 
           if (!keywords.some((k) => text.includes(k))) continue;
 
@@ -74,14 +78,13 @@ async function scanWebsite(page) {
               .catch(() => {}),
             element.click({ delay: 500 }),
           ]);
-
-          return;
         } catch (err) {
           continue;
         }
       }
     }
   }
+  return { success: true };
 }
 async function handleCookies(page) {
   const keywords = /accept|agree|akzeptieren|zustimmen|consent|allow/i;

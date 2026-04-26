@@ -131,8 +131,11 @@ async function setupBrowser(website, browserId, browsers, proxies) {
      */
     const captchaResult = await solveCaptcha(page);
 
-    if (captchaResult.success) {
-      await automate(page);
+    if (captchaResult?.success) {
+      const automateResult = await automate(page);
+      if (automateResult.success) {
+        return { success: true, browserId };
+      }
     }
   } catch (error) {
     log(

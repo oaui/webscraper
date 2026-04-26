@@ -1,8 +1,14 @@
 import { retrieveAiResponse } from "../util/Ai.js";
+import { log } from "../util/Util.js";
 
 export async function solveCaptcha(page) {
   let captchaType = null;
-  for (const frame of page.frames()) {
+  const frames = page.frames();
+
+  if (!frames || frames.length === 0) {
+    return { success: true, captchaType: null };
+  }
+  for (const frame of frames) {
     try {
       const url = frame.url().toLowerCase();
 
@@ -20,10 +26,25 @@ export async function solveCaptcha(page) {
           captchaType,
         };
       }
-      if (frame.url().includes("frcapi.com")) {
+      if (frame.url().includes("/captcha/widget")) {
         captchaType = "friendlycaptcha";
+
+        try {
+          return {
+            success: await solveHelper(frame, 'button[role="checkbox"]')
+              .success,
+            captchaType,
+          };
+        } catch (e) {
+          console.log("FriendlyCaptcha error:", e.message);
+          return { success: false, captchaType };
+        }
+      }
+      //If an element has a class or role that contains checkbox
+      if (await frame.$('[class*="checkbox"], [role*="checkbox"]')) {
+        captchaType = "unknown";
         return {
-          success: await solveHelper(frame, 'button[role="checkbox"]').success,
+          success: await solveHelper(frame, 'div[role="checkbox"]').success,
           captchaType,
         };
       }
@@ -36,20 +57,22 @@ export async function solveCaptcha(page) {
 
       return { success: true, captchaType: null };
     } catch (err) {
-      return { success: false, captchaType: null };
+      continue;
     }
   }
+  return { success: true, captchaType: null }; // fallback
 }
 
 async function solveHelper(frame, type = 'button[role="checkbox"]') {
   try {
     await frame.waitForSelector(type, {
       visible: true,
-      timeout: 3000,
+      timeout: 5000,
     });
     await frame.click(type);
     return { success: true };
-  } catch {
+  } catch (e) {
+    console.log("Captcha solve error:", e.message);
     /**
      * ! Note: We do not return anything, as the frame might detach
      * */
