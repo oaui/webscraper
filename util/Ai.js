@@ -6,7 +6,7 @@ import "dotenv/config";
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
+/** AI logic */
 async function preprocessImage(imagePath) {
   const imageBuffer = fs.readFileSync(imagePath);
 
