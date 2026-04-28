@@ -1,1 +1,1 @@
-https://developer.friendlycaptcha.com/playground
+https://capmonster.cloud/en/demo/recaptcha-v2/

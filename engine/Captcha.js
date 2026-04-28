@@ -1,5 +1,6 @@
 import { retrieveAiResponse } from "../util/Ai.js";
 import { log } from "../util/Util.js";
+import { randnum } from "../util/Helpers.js";
 
 export async function solveCaptcha(page) {
   let captchaType = null;
@@ -166,6 +167,7 @@ async function solveImageChallenge(page, challengeFrame) {
       await frameElement.screenshot({ path: imagePath });
 
       const aiPrompt = `Look at this ${gridType} captcha grid image. Think of cells as an array starting from upper-left as cell[0], going left to right, top to bottom. Which cells should I click to pass the captcha? Reply ONLY with cell references like: cell[0], cell[3], cell[7]`;
+
       const response = await retrieveAiResponse(imagePath, aiPrompt);
 
       const matches = response.match(/cell\[(\d+)\]/gi) || [];
@@ -189,6 +191,7 @@ async function solveImageChallenge(page, challengeFrame) {
 
       const verifyBtn = await challengeFrame.$("#recaptcha-verify-button");
       if (verifyBtn) {
+        await new Promise((r) => setTimeout(r, randnum(5000, 10000)));
         await verifyBtn.click();
         console.log("Clicked verify button");
       }
